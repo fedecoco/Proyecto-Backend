@@ -1,10 +1,12 @@
-class ProductManager {
+ /*/ class ProductManager {
     constructor() {
+      this.patch = 
       this.products = [];
       this.idCounter = 1;
     }
  
 // Metodos
+
 //Agregar Productos
     addProduct(title, description, price, thumbnail, code, stock) {
       if (!title || !description || !price || !thumbnail || !code || !stock) {
@@ -52,3 +54,28 @@ class ProductManager {
   const product = productManager.getProductById(1);
   console.log(product);
   
+  */
+  const ProductManager = require("./ProductManager.js");
+  let productManager = new ProductManager();
+  console.log(productManager);
+  
+  let persistirProduct = async () => {
+      let product = await productManager.addProduct('Botines de futbol', 'Para pasto', 30.0, 'Imagen', 'CODE1', 100);
+  
+  
+      let products = await productManager.getProducts();
+      console.log(`Productos encontrados en Product Manager: ${products.length}`);
+      console.log(products);
+
+      // Obtener un producto por su ID
+      let productById = await productManager.getProductById(product.id);
+      console.log(`Producto encontrado por ID: ${productById.title}`);
+
+      // Actualizar un producto
+      let updatedFields = { title: 'Botines de futbol Nike', description: 'Para pasto', price: 40.0 };
+      await productManager.updateProduct(product.id, updatedFields);
+
+      // Eliminar un producto
+      await productManager.deleteProduct(product.id);
+  };
+  persistirProduct();
