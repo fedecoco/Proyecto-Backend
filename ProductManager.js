@@ -1,16 +1,4 @@
-const fs = require("fs");
-
-class Product {
-  constructor(title, description, price, thumbnail, code, stock) {
-    this.id = null;
-    this.title = title;
-    this.description = description;
-    this.price = price;
-    this.thumbnail = thumbnail;
-    this.code = code;
-    this.stock = stock;
-  }
-}
+import fs from "fs";
 
 class ProductManager {
   #products;
@@ -21,7 +9,7 @@ class ProductManager {
     this.#productFilePath = filePath;
   }
 
-  // METODOS con persistencia en archivo.json
+  // Métodos con persistencia en archivo.json
 
   // Crear producto
   addProduct = async (title, description, price, thumbnail, code, stock) => {
@@ -57,16 +45,15 @@ class ProductManager {
   // Leer productos
   getProducts = async () => {
     try {
-      //Validamos que exista ya el archivo con productos si no se crea vacío para ingresar nuevos:
+      // Validamos que exista el archivo con productos; si no existe, lo creamos vacío
       if (!fs.existsSync(this.#productFilePath)) {
-        //Se crea el archivo vacio.
         await this.saveProducts([]);
       }
 
-      //leemos el archivo
+      // Leemos el archivo
       let productsFile = await fs.promises.readFile(this.#productFilePath, "utf-8");
 
-      //Obtenemos el JSON String
+      // Obtenemos el JSON String
       console.info("Archivo JSON obtenido desde archivo: ");
       console.log(productsFile);
       let products = JSON.parse(productsFile);
@@ -92,66 +79,65 @@ class ProductManager {
       if (product) {
         return product;
       } else {
-        console.error("No se encontró el producto");
+        console.error("No se encontró elproducto con el ID especificado");
         return null;
       }
     } catch (error) {
-      console.error(`Error al obtener el producto con ID ${id}: ${error}`);
-      throw Error(`Error al obtener el producto con ID ${id}: ${error}`);
+      console.error(`Error consultando producto por ID ${id}, detalle del error: ${error}`);
+      throw Error(`Error consultando producto por ID ${id}, detalle del error: ${error}`);
     }
   };
 
-  // Actualizar un producto por su ID
+  // Actualizar un producto
   updateProduct = async (id, updatedFields) => {
     try {
-      const products =await this.getProducts();
-      const productIndex = products.findIndex((p) => p.id === id);
+      let products = await this.getProducts();
+      let productIndex = products.findIndex((p) => p.id === id);
       if (productIndex !== -1) {
-        // Actualizamos los campos que se hayan especificado en updatedFields
-        for (const [key, value] of Object.entries(updatedFields)) {
-          products[productIndex][key] = value;
-        }
-        // Guardamos los cambios en el archivo
+        products[productIndex] = { ...products[productIndex], ...updatedFields };
         await this.saveProducts(products);
-        console.log(`Producto con ID ${id} actualizado correctamente`);
+        console.log(`Producto con ID ${id} actualizado: `, products[productIndex]);
       } else {
         console.error(`No se encontró el producto con ID ${id}`);
       }
     } catch (error) {
-      console.error(`Error al actualizar el producto con ID ${id}: ${error}`);
-      throw Error(`Error al actualizar el producto con ID ${id}: ${error}`);
+      console.error(`Error actualizando producto con ID ${id}, detalle del error: ${error}`);
+      throw Error(`Error actualizando producto con ID ${id}, detalle del error: ${error}`);
     }
   };
 
-  // Eliminar un producto por su ID
+  // Eliminar un producto
   deleteProduct = async (id) => {
     try {
-      const products = await this.getProducts();
-      const filteredProducts = products.filter((p) => p.id !== id);
-      if (filteredProducts.length === products.length) {
-        console.error(`No se encontró el producto con ID ${id}`);
+      let products = await this.getProducts();
+      let productIndex = products.findIndex((p) => p.id === id);
+      if (productIndex !== -1) {
+        products.splice(productIndex, 1);
+        await this.saveProducts(products);
+        console.log(`Producto con ID ${id} eliminado`);
       } else {
-        // Guardamos los cambios en el archivo
-        await this.saveProducts(filteredProducts);
-        console.log(`Producto con ID ${id} eliminado correctamente`);
+        console.error(`No se encontró el producto con ID ${id}`);
       }
     } catch (error) {
-      console.error(`Error al eliminar el producto con ID ${id}: ${error}`);
-      throw Error(`Error al eliminar el producto con ID ${id}: ${error}`);
+      console.error(`Error eliminando producto con ID ${id}, detalle del error: ${error}`);
+      throw Error(`Error eliminando producto con ID ${id}, detalle del error: ${error}`);
     }
   };
 
-  // Guardar lista de productos en archivo
+  // Guardar productos en archivo
   saveProducts = async (products) => {
     try {
-      console.log(`Guardando productos en archivo: ${this.#productFilePath}`);
-      await fs.promises.writeFile(this.#productFilePath, JSON.stringify(products, null, 2));
-      console.log("Lista de productos guardada correctamente");
+      // Convertir la lista de productos a JSON String
+      let productsJson = JSON.stringify(products, null, 2);
+
+      // Guardar el JSON String en el archivo
+      await fs.promises.writeFile(this.#productFilePath, productsJson, "utf-8");
+      console.log(`Productos guardados en ${this.#productFilePath}`);
     } catch (error) {
-      console.error(`Error guardando la lista de productos en archivo: ${error}`);
-      throw Error(`Error guardando la lista de productos en archivo: ${error}`);
+      console.error(`Error guardando productos en archivo, detalle del error: ${error}`);
+      throw Error(`Error guardando productos en archivo, detalle del error: ${error}`);
     }
   };
 }
 
-module.exports = ProductManager;
+export default ProductManager;

@@ -1,0 +1,56 @@
+[
+  {
+    "id":0,
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE1",
+    "stock": 100
+  },
+  {
+    "id":1,
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE2",
+    "stock": 100
+  },
+  {
+    "id":2,
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE3",
+    "stock": 100
+  },
+  {
+    "id":3, 
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE4",
+    "stock": 100
+  },
+  {
+    "id":4,     
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE1",
+    "stock": 100
+  },
+  {
+    "id":5,
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE1",
+    "stock": 100
+  }
+]

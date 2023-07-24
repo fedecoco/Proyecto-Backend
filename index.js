@@ -1,4 +1,4 @@
-const ProductManager = require("./ProductManager.js");
+import ProductManager from "./ProductManager.js";
 
 let productManager = new ProductManager("./files/Products.json");
 console.log(productManager);
@@ -19,11 +19,12 @@ let persistirProduct = async () => {
 
   // Obtener un producto por su ID
   let productById = await productManager.getProductById(product.id);
-if (productById) {
-  console.log(`Producto encontrado por ID: ${productById.title}`);
-} else {
-  console.log(`No se encontró ningún producto con el ID ${product.id}`);
-}
+  if (productById) {
+    console.log(`Producto encontrado por ID: ${productById.title}`);
+  } else {
+    console.log(`No se encontró ningún producto con el ID ${product.id}`);
+  }
+
   // Actualizar un producto
   let updatedFields = {
     title: "Botines de futbol Nike",
