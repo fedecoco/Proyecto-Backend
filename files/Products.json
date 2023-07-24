@@ -38,5 +38,14 @@
     "thumbnail": "Imagen",
     "code": "CODE1",
     "stock": 100
+  },
+  {
+    "id": null,
+    "title": "Botines de futbol",
+    "description": "Para pasto",
+    "price": 30,
+    "thumbnail": "Imagen",
+    "code": "CODE1",
+    "stock": 100
   }
 ]
