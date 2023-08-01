@@ -1,4 +1,4 @@
-import ProductManager from "./ProductManager.js";
+/*import ProductManager from "./src/managers/ProductManager.js";
 
 let productManager = new ProductManager("./files/Products.json");
 console.log(productManager);
@@ -36,4 +36,4 @@ let persistirProduct = async () => {
   // Eliminar un producto
   await productManager.deleteProduct(product.id);
 };
-persistirProduct();
+persistirProduct(); */
