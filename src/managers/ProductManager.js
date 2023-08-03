@@ -4,6 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 const pathToData = './data/data.json';
 
 class ProductManager {
+  constructor() {
+    this.getAll = this.getAll.bind(this);
+    this.getById = this.getById.bind(this);
+    this.addProduct = this.addProduct.bind(this);
+    this.updatedProduct = this.updatedProduct.bind(this);
+    this.deleteProduct = this.deleteProduct.bind(this);
+  }
+
   async getAll(req, res) {
     const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
     const products = await this.readData();

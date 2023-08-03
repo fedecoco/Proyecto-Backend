@@ -13,11 +13,11 @@ cartsRouter.post('/', async (req, res) => {
   }
 });
 
-cartsRouter.get('/:cid', cartService.getProductsByCartId);
+cartsRouter.get('/:cid', (req, res) => cartService.getById(req, res));
 
-cartsRouter.post('/:cid/product/:pid', (req, res) => cartService.addProductToCart(req, res));
+cartsRouter.post('/:cid/product/:pid', (req, res) => cartService.addProduct(req, res));
 
-cartsRouter.delete('/:cid/product/:pid', (req, res) => cartService.deleteProductFromCart(req, res));
+cartsRouter.delete('/:cid/product/:pid', (req, res) => cartService.deleteProduct(req, res));
 
 cartsRouter.put('/:cid/product/:pid', async (req, res) => {
   try {
