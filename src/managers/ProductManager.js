@@ -1,95 +1,86 @@
 import fs from "fs";
+import { v4 as uuidv4 } from 'uuid';
 
+const pathToData = './data/data.json';
 
-const pathToData = './data/data.json'
+class ProductManager {
+  async getAll(req, res) {
+    const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
+    const products = await this.readData();
+    res.json(limit ? products.slice(0, limit) : products);
+  }
 
+  async getById(req, res) {
+    const products = await this.readData();
+    const product = products.find((item) => item.id === parseInt(req.params.pid));
+    if (product) {
+      res.json(product);
+    } else {
+      res.status(404).json({ mensaje: 'Producto no encontrado' });
+    }
+  }
 
-class Container{
-    add = async(product) => {
-        if(!product.name || !product.price || !product.thumbnail || !product.stock || !product.description){
-            return{status:"error", error:"faltan completar datos"}
-        }
-        try{
-            if(fs.existsSync(pathToData)){
-                let data = await fs.promises.readFile(pathToData,'utf-8')
-                let products = JSON.parse(data)
-                if(products.length===0){
-                    let newProduct = Object.assign({id:1, timestamp:Date.now()},product)
-                    await fs.promises.writeFile(pathToData, JSON.stringify([newProduct], null, 2)) 
-                    return{status:"success", message:"New Product Created", id:1}
-                }else{
-                    let newId = products[products.length-1].id+1
-                    product.id = newId
-                    product.timestamp=Date.now()
-                    products.push(product)
-                    await fs.promises.writeFile(pathToData, JSON.stringify(products,null,2))
-                    return{status:"success", message:"New Product Created", id:newId} 
-                }
-            }else{
-                let newProduct = Object.assign({id:1, timestamp:Date.now()},product)
-                await fs.promises.writeFile(pathToData, JSON.stringify([newProduct], null, 2)) 
-                return{status:"success", message:"New Product Created", id:1}
-            }
-        }
-        catch(error){
-            return{status:"error", message:error}
-        }
+  async addProduct(req, res) {
+    const { title, description, code, price } = req.body;
+    const newProduct = {
+      id: uuidv4(),
+      title,
+      description,
+      code,
+      price,
+    };
+    const product = await this.readData();
+    product.push(newProduct);
+    await this.overWrite(product);
+    res.status(201).json(newProduct);
+  }
+
+  async updatedProduct(req, res) {
+    const { title, description, code, price } = req.body;
+    const products = await this.readData();
+    const indexProduct = products.findIndex((item) => item.id === req.params.pid);
+    if (indexProduct !== -1) {
+      products[indexProduct] = {
+        ...products[indexProduct],
+        title,
+        description,
+        code,
+        price,
+      };
+      await this.overWrite(products);
+      res.json(products[indexProduct]);
+    } else {
+      res.status(404).json({ mensaje: 'Producto no encontrado' });
     }
-    overwrite = async(product, id)=>{
-        let data = await fs.promises.readFile(pathToData,'utf-8')
-        let products = JSON.parse(data)
-        let productsNotId = products.filter(u => u.id !== id)
-        let newProduct = Object.assign({id:id},product)
-        productsNotId.push(newProduct)
-        await fs.promises.writeFile(pathToData, JSON.stringify(productsNotId,null,2))
-        return{status:"success", message:"Product Modified", id:id}
+  }
+
+  async deleteProduct(req, res) {
+    const products = await this.readData();
+    const filterProduct = products.filter((item) => item.id !== req.params.pid);
+    if (filterProduct.length !== products.length) {
+      await this.overWrite(filterProduct);
+      res.json({ mensaje: 'Producto eliminado exitosamente' });
+    } else {
+      res.status(404).json({ mensaje: 'Producto no encontrado' });
     }
-    getById = async(id)=>{
-        if(fs.existsSync(pathToData)){
-            let data = await fs.promises.readFile(pathToData,'utf-8')
-            let products = JSON.parse(data)
-            let product = products.find(u => u.id === id)
-            if(product){
-                return(product)
-            }
-            else{
-                return{status:"error", error:"Product not found"}
-            }
-        }
+  }
+
+  async readData() {
+    try {
+      const data = await fs.promises.readFile(pathToData, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      return [];
     }
-    getAll = async () =>{
-        if(fs.existsSync(pathToData)){
-            let data = await fs.promises.readFile(pathToData,'utf-8')
-            let products = JSON.parse(data)
-            return(products)
-        }
+  }
+
+  async overWrite(data) {
+    try {
+      await fs.promises.writeFile(pathToData, JSON.stringify(data, null, 2));
+    } catch (error) {
+      throw new Error('Error al escribir en el archivo');
     }
-    deleteById = async (id) =>{
-        if(!id){
-            return{status:"error", error:"Id needed"}
-        }
-        if(fs.existsSync(pathToData)){
-            let data = await fs.promises.readFile(pathToData,'utf-8')
-            let products = JSON.parse(data)
-            let newProducts = products.filter(u => u.id !== id)
-            await fs.promises.writeFile(pathToData,JSON.stringify(newProducts,null,2))
-            return{status:"success",message:"Product Deleted"}
-        }
-    }
-    deleteAll = async () =>{
-        if(fs.existsSync(pathToData)){
-            let data = await fs.promises.readFile(pathToData,'utf-8')
-            let products = JSON.parse(data)
-            if(products==''){
-                return{status:"error", error:"There are no Products"}
-            }else{
-                await fs.promises.writeFile(pathToData,'')
-                return{status:"success",message:"All Products Deleted"}
-            }
-        }else{
-            return{status:"error", error:"The file doesnt exist"}
-        }
-        
-    }
+  }
 }
-export default Container;
+
+export default ProductManager;
