@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
 const pathToData = './data/cart.json';
@@ -11,31 +11,33 @@ class CartManager {
 
   async getById(req, res) {
     const carts = await this.readData();
-    const cart = carts.find((item) => item.id === parseInt(req.params.cid));
+    const cart = carts.find((item) => item.id == req.params.cid);
+
     if (cart) {
       res.json(cart);
     } else {
       res.status(404).json({ mensaje: 'Carrito no encontrado' });
     }
+  
   }
 
   async addProduct(req, res) {
-    const { productId } = req.body;
+    const { pid } = req.params;
     const carts = await this.readData();
-    const indexCart = carts.findIndex((item) => item.id === req.params.cid);
+    const indexCart = carts.findIndex((item) => item.id == req.params.cid);
     if (indexCart !== -1) {
-      if (carts[indexCart].products.find((item) => item.id === productId)) {
-        res.status(400).json({ mensaje: 'El producto ya se encuentra en el carrito' });
+      const indexProduct = carts[indexCart].products.findIndex((item) => item.id === pid);
+      if (indexProduct !== -1) {
+        carts[indexCart].products[indexProduct].quantity++;
       } else {
-        carts[indexCart].products.push({ id: productId });
-        await this.overWrite(carts);
-        res.json(carts[indexCart]);
+        carts[indexCart].products.push({ id: pid, quantity: 1 });
       }
+      await this.overWrite(carts);
+      res.json(carts[indexCart]);
     } else {
       const newCart = {
         id: uuidv4(),
-        timestamp: new Date().toISOString(),
-        products: [{ id: productId }],
+        products: [{ id: pid, quantity: 1 }],
       };
       carts.push(newCart);
       await this.overWrite(carts);
@@ -72,17 +74,20 @@ class CartManager {
     }
   }
 
-  async createCart(req, res) {
-    const { productId } = req.body;
+  async createCart(products) {
+    let carts = await this.readData();
+    if (carts.length == 0) {
+      carts = [];
+    }
+    
     const newCart = {
       id: uuidv4(),
-      timestamp: new Date().toISOString(),
-      products: [{ id: productId }],
+      products: products.map((product) => ({ id: product.id, quantity: product.quantity || 1 })),
     };
-    const carts = await this.readData();
+    
     carts.push(newCart);
     await this.overWrite(carts);
-    res.status(201).json(newCart);
+    return newCart;
   }
 
   async readData() {
@@ -101,35 +106,9 @@ class CartManager {
       throw new Error('Error al escribir en el archivo');
     }
   }
-  async getProductsByCartId(req, res) {
-    const carts = await this.readData();
-    const cart = carts.find((item) => item.id === req.params.cid);
-    if (cart) {
-      res.json(cart.products);
-    } else {
-      res.status(404).json({ mensaje: 'Carrito no encontrado' });
-    }
-  }
-  async updateProductInCart(cartId, productId, quantity) {
-    const carts = await this.readData();
-    const cartIndex = carts.findIndex((item) => item.id === cartId);
-    if (cartIndex !== -1) {
-      const productIndex = carts[cartIndex].products.findIndex((item) => item.id === productId);
-      if (productIndex !== -1) {
-        carts[cartIndex].products[productIndex].quantity = quantity;
-        await this.overWrite(carts);
-        return carts[cartIndex];
-      } else {
-        throw new Error('Producto no encontrado');
-      }
-    } else {
-      throw new Error('Carrito no encontrado');
-    }
-  }
 }
 
 export default CartManager;
-
 
 
 

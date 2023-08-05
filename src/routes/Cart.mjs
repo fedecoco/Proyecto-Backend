@@ -6,14 +6,24 @@ const cartService = new CartManager();
 
 cartsRouter.post('/', async (req, res) => {
   try {
-    const cart = await cartService.createCart(req.body.productId);
+    const productId = req.query.productId;
+    const { quantity } = req.query;
+    const cart = await cartService.createCart([{ id: productId, quantity }]);
     res.status(201).json(cart);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al crear el carrito' });
   }
+ ;
 });
 
-cartsRouter.get('/:cid', (req, res) => cartService.getById(req, res));
+cartsRouter.get('/:cid', async (req, res) => {
+  try {
+    const cart = await cartService.getById(req, res);
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener el carrito' });
+  }
+});
 
 cartsRouter.post('/:cid/product/:pid', (req, res) => cartService.addProduct(req, res));
 
