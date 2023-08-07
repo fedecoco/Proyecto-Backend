@@ -6,14 +6,12 @@ const cartService = new CartManager();
 
 cartsRouter.post('/', async (req, res) => {
   try {
-    const productId = req.query.productId;
-    const { quantity } = req.query;
-    const cart = await cartService.createCart([{ id: productId, quantity }]);
+    const { productId, quantity } = req.query;
+    const cart = await cartService.createCart(productId, quantity);
     res.status(201).json(cart);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al crear el carrito' });
   }
- ;
 });
 
 cartsRouter.get('/:cid', async (req, res) => {

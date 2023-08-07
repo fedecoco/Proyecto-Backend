@@ -1,3 +1,4 @@
+/*
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from 'multer';
@@ -38,3 +39,4 @@ export const uploader = multer({
 
 
 export const pruebaString = "Esto es una prueba de export"
+*/
