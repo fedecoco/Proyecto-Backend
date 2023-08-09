@@ -12,10 +12,14 @@ class ProductManager {
     this.deleteProduct = this.deleteProduct.bind(this);
   }
 
-  async getAll(req, res) {
-    const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
-    const products = await this.readData();
-    res.json(limit ? products.slice(0, limit) : products);
+  async getAll() {
+    try {
+      const data = await this.readData();
+      return data;
+    } catch (error) {
+      console.error('Error al obtener los productos:', error);
+      return [];
+    }
   }
 
   async getById(req, res) {
