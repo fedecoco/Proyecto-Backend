@@ -1,11 +1,17 @@
 import express from 'express';
-import viewRouter from "./routes/view.router.js"
-import productsRouter from './routes/Products.mjs';
-import cartsRouter from './routes/Cart.mjs';
+
+import routerP from './routes/Products.js';
+import routerC from './routes/Cart.mjs';
+import routerV from './routes/view.router.js';
+
 import { __dirname } from "./utils.js"
 import handlebars from "express-handlebars"
+
 import { Server } from "socket.io"
-import ProductManager from "./managers/productManager.js"
+import socketProducts from "./listeners/socketProducts.js"
+import socketChat from './listeners/socketChat.js';
+
+import connectToDB from "./config/configServer.js"
 
 const app = express();
 const PORT = 8080;
@@ -21,32 +27,23 @@ app.set("views", __dirname + "/views")
 
 
 
-app.use('/api/products', productsRouter);
-app.use('/api/cart', cartsRouter);
-app.use('/', viewRouter)
+app.use('/api/products', routerP);
+app.use('/api/cart', routerC);
+app.use('/', routerV)
+
+connectToDB()
 
 const httpServer = app.listen(PORT, () => {
-  console.log("server is working")
-})
+  try {
+      console.log(`Listening to the port ${PORT}\nAcceder a:`);
+      console.log(`\t1). http://localhost:${PORT}/api/products`)
+      console.log(`\t2). http://localhost:${PORT}/api/carts`);
+  }
+  catch (err) {
+      console.log(err);
+  }
+});
 
 const socketServer = new Server(httpServer)
-const pmanagersocket = new ProductManager(__dirname + "/data/data.json")
-
-socketServer.on("connection", async (socket) => {
-  console.log("client connected con ID:", socket.id)
-  const listadeproductos = await pmanagersocket.getAll({}) 
-  socketServer.emit("enviodeproducts", listadeproductos)
-
-  socket.on("addProduct", async (obj) => {
-    await pmanagersocket.addProduct(obj)
-    const listadeproductos = await pmanagersocket.getAll({}) 
-    socketServer.emit("enviodeproducts", listadeproductos)
-  })
-
-  socket.on("deleteProduct", async (id) => {
-    console.log(id)
-    await pmanagersocket.deleteProduct(id)
-    const listadeproductos = await pmanagersocket.getAll({}) 
-    socketServer.emit("enviodeproducts", listadeproductos)
-  })
-})
+socketProducts(socketServer)
+socketChat(socketServer)

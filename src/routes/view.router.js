@@ -1,18 +1,23 @@
 import { Router } from "express";
-import ProductManager from "../managers/productManager.js";
+import ProductManager from "../dao/managers/ProductManager.js";
 import { __dirname } from "../utils.js";
-const pmanager = new ProductManager(__dirname + "/data/data.json")
+const pm = new ProductManager(__dirname + "/data/data.json")
 
-const router = Router()
+const routerV = Router()
 
-router.get('/', async (req, res) => {
-  const listadeproductos = await pmanager.getAll({})
-  console.log(listadeproductos)
-  res.render('home', {listadeproductos})
+routerV.get("/",async(req,res)=>{
+  const listadeproductos=await pm.getProductsView()
+  res.render("home",{listadeproductos})
 })
 
-router.get('/realtimeproducts', (req, res) => {
-  res.render('realtimeproducts')
+routerV.get("/realtimeproducts",(req,res)=>{
+res.render("realtimeproducts")
 })
 
-export default router
+routerV.get("/chat",(req,res)=>{
+res.render("chat")
+})
+
+
+
+export default routerV
