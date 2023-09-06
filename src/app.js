@@ -2,7 +2,7 @@ import express from 'express';
 
 import routerP from './routes/Products.js';
 import routerC from './routes/Cart.mjs';
-import routerV from './routes/view.router.js';
+import routerV from './routes/views.router.js';
 
 import { __dirname } from "./utils.js"
 import handlebars from "express-handlebars"
@@ -12,6 +12,16 @@ import socketProducts from "./listeners/socketProducts.js"
 import socketChat from './listeners/socketChat.js';
 
 import connectToDB from "./config/configServer.js"
+
+// Sessions
+import FileStore from 'session-file-store'
+import session from 'express-session';
+import mongoose from 'mongoose';
+
+//import Routers
+import viewsRouter from './routes/views.router.js';
+import usersViewRouter from './routes/users.views.router.js';
+import sessionsRouter from './routes/sessions.router.js'
 
 const app = express();
 const PORT = 8080;
@@ -25,11 +35,38 @@ app.engine("handlebars", handlebars.engine())
 app.set("view engine", "handlebars")
 app.set("views", __dirname + "/views")
 
+//Conectamos nuestra session con el file storage.
+
+const fileStorage = FileStore(session);
+
+ app.use(session({
+  //ttl: Time to live in seconds,
+  //retries: Reintentos para que el servidor lea el archivo del storage.
+  //path: Ruta a donde se buscará el archivo del session store.
+
+  // Usando --> session-file-store
+    store: new fileStorage({ path: "./sessions", ttl: 15, retries: 0 }),
+
+    //store: MongoStore.create({
+    //mongoUrl: "mongodb+srv://fedemperez05:0523Fede@cluster.mo3k8jw.mongodb.net/?retryWrites=true&w=majority",
+    //mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+    //ttl: 10
+    // }),
+
+
+  secret: "coderS3cr3t",
+  resave: false, //guarda en memoria
+  saveUninitialized: true, //lo guarda a penas se crea
+}));
+
 
 
 app.use('/api/products', routerP);
 app.use('/api/cart', routerC);
 app.use('/', routerV)
+app.use("/", viewsRouter);
+app.use("/users", usersViewRouter);
+app.use("/api/sessions", sessionsRouter);
 
 connectToDB()
 
