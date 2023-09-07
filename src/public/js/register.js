@@ -8,7 +8,7 @@ form.addEventListener('submit', e => {
     data.forEach((value, key) => obj[key] = value);
     console.log("Objeto formado:");
     console.log(obj);
-    fetch('/api/sessions/register', {
+    fetch('/register', {
         method: 'POST',
         body: JSON.stringify(obj),
         headers: {

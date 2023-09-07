@@ -63,8 +63,8 @@ const fileStorage = FileStore(session);
 
 app.use('/api/products', routerP);
 app.use('/api/cart', routerC);
-app.use('/', routerV)
-app.use("/", viewsRouter);
+app.use('/', routerV);
+
 app.use("/users", usersViewRouter);
 app.use("/api/sessions", sessionsRouter);
 

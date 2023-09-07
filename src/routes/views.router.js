@@ -39,6 +39,10 @@ routerV.get("/session", (req, res) => {
         res.send("Bienvenido!");
     }
 });
+//Register
+routerV.get('/register', (req, res) => {
+    res.render('register'); // Renderiza la plantilla de registro
+});
 
 //Login
 routerV.get('/login', (req, res) => {
