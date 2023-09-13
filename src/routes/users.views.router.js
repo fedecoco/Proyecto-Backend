@@ -15,6 +15,10 @@ routerV.get("/", (req, res) => {
     res.render('profile', {
         user: req.session.user
     })
+
+    routerV.get("/error", (req, res) => {
+        res.render("error");
+    });
 });
 
 export default routerV;

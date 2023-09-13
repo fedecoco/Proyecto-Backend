@@ -67,12 +67,11 @@ routerV.get("/logout", (req, res) => {
 
 //Auth middleware:
 function auth(req, res, next){
-    if (req.session.user === 'pepe' && req.session.admin) {
+    if (req.session.user && req.session.admin) {
         return next();
     } else{
         return res.status(403).send("Usuario no autorizado para ingresar a este recurso.");
     }
-    
 }
 
 routerV.get('/private', auth, (req, res) =>{

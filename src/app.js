@@ -18,10 +18,16 @@ import FileStore from 'session-file-store'
 import session from 'express-session';
 import mongoose from 'mongoose';
 
+//Passport imports
+import passport from 'passport';
+import initializePassport from './config/passport.config.js';
+
 //import Routers
 import viewsRouter from './routes/views.router.js';
 import usersViewRouter from './routes/users.views.router.js';
 import sessionsRouter from './routes/sessions.router.js'
+import githubLoginViewRouter from './routes/github-login.views.router.js'
+
 
 const app = express();
 const PORT = 8080;
@@ -59,6 +65,10 @@ const fileStorage = FileStore(session);
   saveUninitialized: true, //lo guarda a penas se crea
 }));
 
+//TODO: Middlewares Passport
+initializePassport();
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 app.use('/api/products', routerP);
@@ -66,7 +76,8 @@ app.use('/api/cart', routerC);
 app.use('/', routerV);
 
 app.use("/users", usersViewRouter);
-app.use("/api/sessions", sessionsRouter);
+app.use("/api/session", sessionsRouter);
+app.use("/github", githubLoginViewRouter);
 
 connectToDB()
 
